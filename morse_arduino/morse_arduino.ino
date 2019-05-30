@@ -2,31 +2,28 @@
 #include <PubSubClient.h>
 
 
+#define highThr         200 // threshold between short and long input
+#define pauseThr        300 // new letter after this time LOW on button
+#define buttonPin         0 // number of the button pin
+#define abcLen           62 // length of the binary tree
 
-#define highThr       200 // threshold between short and long input
-#define pauseThr      300 // new letter after this time LOW on button
-#define buttonPin       0 // the number of the button pin
-#define abcLen         62 // length of the abc array
 
-// consts
+// constants
 const char *abc      =  "ETIANMSURWDKGOHVF\0L\0PJBXCYZQ\0\054S3\0\0D2\0\0+\0\0\0J16=/\0C\0H\07\0GN8\090";
 const char *ssid     =  "Landownunder";
 const char *password =  "icomefroma";
-const char *topicPub =  "channels/791548/publish/EV5C1YH9KFJ88CKQ";
-const char *topicSub =  "channels/791548/subscribe/csv/MS83GOAH49SF5S0L";
-
-const char *mqttUser = "stby04";
-const char *mqttPass = "6VDSH6HM6NAZMZIQ";
+const char *topicPub =  "morse/791548";
+const char *topicSub =  "morse/791548";
 
 // globals
-uint8_t currPos      =   1; // current position in binary tree "abc"
-uint8_t bttnState   = LOW; // last state of button
-uint8_t s            =   0; // state of DFA
-uint32_t t           =   0; // time in ms
+uint8_t    currPos   =   1; // current position in binary tree "abc"
+uint8_t    bttnState = LOW; // last state of button
+uint8_t    s         =   0; // state of DFA
+uint32_t   t         =   0; // time in ms
 
 WiFiClient client;
 PubSubClient mqtt(client);
-String mac;
+String       mac;           // MAC addr. is used as uid
 
 
 // declarations
@@ -43,19 +40,20 @@ void setup() {
   Serial.begin(115200);
   // while ( !Serial ) delay(10);
   pinMode(buttonPin, INPUT);
-  Serial.print("\nConnecting to network ");
-  Serial.println(ssid);
+  Serial.println("Connecting to WiFi");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) delay(100);
 
   mac = WiFi.macAddress();
-  //mac[sMac.length()+1];
-  //sMac.toCharArray(mac, sMac.length());
+  uint16_t l = mac.length();
+  char buf[l];
+  mac.toCharArray(buf, l + 1);
 
-  mqtt.setServer("mqtt.thingspeak.com", 1883);
+  mqtt.setServer("test.mosquitto.org", 1883);
   mqtt.setCallback(onReceive);
-  while(!mqtt.connect("1234", mqttUser, mqttPass)) delay(500);
+  while (!mqtt.connect(buf)) delay(500);
+  Serial.println("MQTT connected");
   mqtt.subscribe(topicSub);
 }
 
@@ -93,13 +91,14 @@ void loop() {
 }
 
 void sendLetter(char letter) {
-  Serial.println(letter);
-  String message = "field1=" + mac + "&field2=" + letter;
+  Serial.print("I wrote: \"");
+  Serial.print(letter);
+  Serial.print("\"\n");
+  String message = mac + "," + letter;
   uint16_t l = message.length();
   char buf[l];
-  message.toCharArray(buf,l+1);
-  //mqtt.publish(topicPub, buf);
-  mqtt.publish(topicPub, "field1=42");
+  message.toCharArray(buf, l + 1);
+  mqtt.publish(topicPub, buf);
 }
 
 void sendLetter(uint8_t pos) {
@@ -111,11 +110,32 @@ char getLetter(uint8_t pos) {
 }
 
 void onReceive(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
+  char sender[length];
+  char letter;
+  uint8_t part = 0;
   for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
+    char c = (char)payload[i];
+    if (',' == c) {
+      part = 1;
+      letter = (char)payload[i + 1];
+      sender[i] = '\0';
+    }
+    if (0 == part) {
+      sender[i] = c;
+    }
   }
-  Serial.println();
+
+  uint16_t l = mac.length();
+  char buf[l];
+  mac.toCharArray(buf, l + 1);
+
+  if (0 != strcmp(sender, buf)) {
+    // sender is someone else
+    Serial.print(sender);
+    Serial.print(" wrote: \"");
+    Serial.print(letter);
+    Serial.print("\"\n");
+
+    // OUTPUT TO DISPLAY HERE
+  }
 }
