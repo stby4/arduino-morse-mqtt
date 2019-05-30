@@ -1,31 +1,37 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266MQTTClient.h>
+#include <Arduino_JSON.h>
+
 
 #define highThr       200 // threshold between short and long input
 #define pauseThr      300 // new letter after this time LOW on button
 #define buttonPin       0 // the number of the button pin
 #define abcLen         62 // length of the abc array
 
-
-struct packet
-{
-  String sender;
-  char letter;
-};
-typedef struct packet Packet;
-
+// consts
 const char *abc      =  "ETIANMSURWDKGOHVF\0L\0PJBXCYZQ\0\054S3\0\0D2\0\0+\0\0\0J16=/\0C\0H\07\0GN8\090";
 const char *ssid     =  "Landownunder";
 const char *password =  "icomefroma";
 const char *topic    =  "messages";
 
+// globals
 uint8_t currPos      =   1; // current position in binary tree "abc"
 uint8_t buttnState   = LOW; // last state of button
 uint8_t s            =   0; // state of DFA
 uint32_t t           =   0; // time in ms
 
-MQTTClient client;
+JSONVar msg;
 
+
+// declarations
+void setup();
+void loop();
+void sendLetter(char letter);
+void sendLetter(uint8_t pos);
+char getLetter(uint8_t pos);
+
+
+// implementations
 void setup() {
   Serial.begin(115200);
   // while ( !Serial ) delay(10);
@@ -36,7 +42,9 @@ void setup() {
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) delay(100);
 
-  client.begin("mqtt://test.mosquitto.org/");
+  msg["sender"] = "STBY4";
+
+  //client.begin("mqtt://test.mosquitto.org/");
 }
 
 void loop() {
@@ -46,7 +54,7 @@ void loop() {
   if (LOW == buttnState) {
     if (HIGH == b) {
       // button has been unpressed, is pressed now
-      if (2* currPos > abcLen) {
+      if (2 * currPos > abcLen) {
         sendLetter(currPos);
         currPos = 1;
       }
@@ -75,7 +83,12 @@ void loop() {
 void sendLetter(char letter) {
   // TODO publish letter
   Serial.println(letter);
-  // client.publish(topic, letter);
+
+  msg["char"] = letter;
+  String json = JSON.stringify(msg);
+  Serial.println(json);
+
+  // client.publish(topic, json);
 }
 
 void sendLetter(uint8_t pos) {
@@ -83,5 +96,5 @@ void sendLetter(uint8_t pos) {
 }
 
 char getLetter(uint8_t pos) {
-  return abc[pos-2];
+  return abc[pos - 2];
 }
