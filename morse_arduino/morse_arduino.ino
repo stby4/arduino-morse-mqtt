@@ -1,9 +1,9 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266MQTTClient.h>
 
-#define highThr       500 // threshold between short and long input
-#define pauseThr      500 // new letter after 500 ms LOW on button
-#define buttonPin       2 // the number of the button pin
+#define highThr       200 // threshold between short and long input
+#define pauseThr      300 // new letter after this time LOW on button
+#define buttonPin       0 // the number of the button pin
 #define abcLen         62 // length of the abc array
 
 
@@ -14,14 +14,15 @@ struct packet
 };
 typedef struct packet Packet;
 
-const char *abc      = "ETIANMSURWDKGOHVFÜLÄPJBXCYZQÖÖ54S3É\0D2\0È+\0\0ÀJ16=/\0C\0H\07\0GN8\090";
-const char *ssid     = "Landownunder";
-const char *password = "icomefroma";
-const char *topic    = "messages";
+const char *abc      =  "ETIANMSURWDKGOHVF\0L\0PJBXCYZQ\0\054S3\0\0D2\0\0+\0\0\0J16=/\0C\0H\07\0GN8\090";
+const char *ssid     =  "Landownunder";
+const char *password =  "icomefroma";
+const char *topic    =  "messages";
 
-uint8_t currPos   =     0; // current position in binary tree "abc"
-uint8_t lastState =   LOW; // last state of button
-uint32_t t        =     0; // time in ms
+uint8_t currPos      =   1; // current position in binary tree "abc"
+uint8_t buttnState   = LOW; // last state of button
+uint8_t s            =   0; // state of DFA
+uint32_t t           =   0; // time in ms
 
 MQTTClient client;
 
@@ -34,45 +35,53 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) delay(100);
-  
+
   client.begin("mqtt://test.mosquitto.org/");
 }
 
 void loop() {
-  delay(100);
   int b = digitalRead(buttonPin);
 
-  if (LOW == lastState) {
-    if(HIGH == b) {
+
+  if (LOW == buttnState) {
+    if (HIGH == b) {
       // button has been unpressed, is pressed now
-      if(0 != currPos) {
+      if (2* currPos > abcLen) {
         sendLetter(currPos);
-        currPos = 0;
+        currPos = 1;
       }
       t = millis();
     } else {
       // button still unpressed
-      uint32_t dT = t - millis();
-      if(0 != currPos && dT > pauseThr) {
+      uint32_t dT = millis() - t;
+      if (1 < currPos && dT > pauseThr) {
         sendLetter(currPos);
-        currPos = 0;
+        currPos = 1;
       }
     }
   }
-  else if (HIGH == lastState && LOW == b) {
+  else if (HIGH == buttnState && LOW == b) {
     // button has been pressed, is unpressed now
-    uint32_t dT = t - millis();
-    uint8_t newPos = ((currPos + 2) * 2) - 2;
-    if(dT > highThr) ++currPos;
-    if(newPos < abcLen/2) currPos = newPos;
+    uint32_t dT = millis() - t;
+    uint8_t newPos = currPos * 2;
+    if (dT > highThr) ++newPos;
+    if (newPos < abcLen) currPos = newPos;
+    t = millis();
   }
 
-  lastState = b;
+  buttnState = b;
+}
+
+void sendLetter(char letter) {
+  // TODO publish letter
+  Serial.println(letter);
+  // client.publish(topic, letter);
 }
 
 void sendLetter(uint8_t pos) {
-  // TODO publish letter
-  char letter = abc[pos];
-  Serial.println(letter);
-  // client.publish(topic, letter);
+  sendLetter(getLetter(pos));
+}
+
+char getLetter(uint8_t pos) {
+  return abc[pos-2];
 }
