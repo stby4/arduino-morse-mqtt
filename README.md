@@ -1,5 +1,5 @@
 # IoT Engineering
-## Project MY_TEAM_PROJECT_TITLE
+## Project Morse Code
 
 > *Note: Do not work on this repository right away.*<br/>
 > *[Create your team copy by clicking this GitHub Classroom link](https://classroom.github.com/g/B7ncqTw4).*
@@ -15,7 +15,7 @@ This project is part of the [IoT Engineering](../../../fhnw-iot) course.
 
 ### Team members
 * @Roussisr, Raphael Roussis
-* @stby1, Hinrich Kaestner
+* @stby4, Hinrich Kaestner
 
 ## Deliverables
 The following deliverables are mandatory.
