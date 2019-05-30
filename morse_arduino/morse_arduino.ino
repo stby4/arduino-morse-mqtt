@@ -1,6 +1,6 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266MQTTClient.h>
-#include <Arduino_JSON.h>
+#include <PubSubClient.h>
+
 
 
 #define highThr       200 // threshold between short and long input
@@ -12,15 +12,21 @@
 const char *abc      =  "ETIANMSURWDKGOHVF\0L\0PJBXCYZQ\0\054S3\0\0D2\0\0+\0\0\0J16=/\0C\0H\07\0GN8\090";
 const char *ssid     =  "Landownunder";
 const char *password =  "icomefroma";
-const char *topic    =  "messages";
+const char *topicPub =  "channels/791548/publish/EV5C1YH9KFJ88CKQ";
+const char *topicSub =  "channels/791548/subscribe/csv/MS83GOAH49SF5S0L";
+
+const char *mqttUser = "stby04";
+const char *mqttPass = "6VDSH6HM6NAZMZIQ";
 
 // globals
 uint8_t currPos      =   1; // current position in binary tree "abc"
-uint8_t buttnState   = LOW; // last state of button
+uint8_t bttnState   = LOW; // last state of button
 uint8_t s            =   0; // state of DFA
 uint32_t t           =   0; // time in ms
 
-JSONVar msg;
+WiFiClient client;
+PubSubClient mqtt(client);
+String mac;
 
 
 // declarations
@@ -29,6 +35,7 @@ void loop();
 void sendLetter(char letter);
 void sendLetter(uint8_t pos);
 char getLetter(uint8_t pos);
+void onReceive(char* topic, byte* payload, unsigned int length);
 
 
 // implementations
@@ -42,16 +49,21 @@ void setup() {
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) delay(100);
 
-  msg["sender"] = "STBY4";
+  mac = WiFi.macAddress();
+  //mac[sMac.length()+1];
+  //sMac.toCharArray(mac, sMac.length());
 
-  //client.begin("mqtt://test.mosquitto.org/");
+  mqtt.setServer("mqtt.thingspeak.com", 1883);
+  mqtt.setCallback(onReceive);
+  while(!mqtt.connect("1234", mqttUser, mqttPass)) delay(500);
+  mqtt.subscribe(topicSub);
 }
 
 void loop() {
+  mqtt.loop();
   int b = digitalRead(buttonPin);
 
-
-  if (LOW == buttnState) {
+  if (LOW == bttnState) {
     if (HIGH == b) {
       // button has been unpressed, is pressed now
       if (2 * currPos > abcLen) {
@@ -68,7 +80,7 @@ void loop() {
       }
     }
   }
-  else if (HIGH == buttnState && LOW == b) {
+  else if (HIGH == bttnState && LOW == b) {
     // button has been pressed, is unpressed now
     uint32_t dT = millis() - t;
     uint8_t newPos = currPos * 2;
@@ -77,18 +89,17 @@ void loop() {
     t = millis();
   }
 
-  buttnState = b;
+  bttnState = b;
 }
 
 void sendLetter(char letter) {
-  // TODO publish letter
   Serial.println(letter);
-
-  msg["char"] = letter;
-  String json = JSON.stringify(msg);
-  Serial.println(json);
-
-  // client.publish(topic, json);
+  String message = "field1=" + mac + "&field2=" + letter;
+  uint16_t l = message.length();
+  char buf[l];
+  message.toCharArray(buf,l+1);
+  //mqtt.publish(topicPub, buf);
+  mqtt.publish(topicPub, "field1=42");
 }
 
 void sendLetter(uint8_t pos) {
@@ -97,4 +108,14 @@ void sendLetter(uint8_t pos) {
 
 char getLetter(uint8_t pos) {
   return abc[pos - 2];
+}
+
+void onReceive(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
 }
