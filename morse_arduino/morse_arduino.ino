@@ -1,14 +1,62 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <TM1637Display.h>
 
 
 #define highThr         200 // threshold between short and long input
 #define pauseThr        300 // new letter after this time LOW on button
-#define buttonPin         0 // number of the button pin
+#define sig               2 // number of the button pin
+#define clk               0 // pin definitions for TM1367
+#define dio              15 // pin definitions for TM1367
 #define abcLen           62 // length of the binary tree
 
 
 // constants
+const uint8_t seg[]  = {
+  SEG_A | SEG_F | SEG_B | SEG_E | SEG_C | SEG_D, // 0
+  SEG_B | SEG_C,                                 // 1
+  SEG_A | SEG_B | SEG_G | SEG_E | SEG_C,         // 2
+  SEG_A | SEG_B | SEG_G | SEG_C | SEG_D,         // 3
+  SEG_F | SEG_B | SEG_G | SEG_C,                 // 4
+  SEG_A | SEG_F | SEG_G | SEG_C | SEG_D,         // 5
+  SEG_A | SEG_F | SEG_G | SEG_E | SEG_C | SEG_D, // 6
+  SEG_A | SEG_B | SEG_C,                         // 7
+  SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F | SEG_G, // 8
+  SEG_A | SEG_B | SEG_C | SEG_D | SEG_F | SEG_G, // 9
+  SEG_G | SEG_D,                                 // :
+  SEG_G | SEG_D,                                 // ;
+  SEG_G | SEG_D,                                 // <
+  SEG_G | SEG_D,                                 // =
+  SEG_G | SEG_D,                                 // >
+  SEG_A | SEG_B | SEG_G | SEG_E | SEG_D,         // ?
+  SEG_G | SEG_E | SEG_D | SEG_C,                 // @
+  SEG_A | SEG_F | SEG_B | SEG_G | SEG_E | SEG_C, // A
+  SEG_F | SEG_G | SEG_E | SEG_C | SEG_D,         // b
+  SEG_A | SEG_F | SEG_E | SEG_D,                 // C
+  SEG_B | SEG_G | SEG_E | SEG_C | SEG_D,         // d
+  SEG_A | SEG_F | SEG_G | SEG_E | SEG_D,         // E
+  SEG_A | SEG_F | SEG_G | SEG_E,                 // F
+  SEG_A | SEG_F | SEG_B | SEG_G | SEG_C, SEG_D,  // g
+  SEG_F | SEG_B | SEG_G | SEG_E | SEG_C,         // H
+  SEG_B | SEG_C,                                 // I
+  SEG_B | SEG_C | SEG_D,                         // J
+  SEG_F | SEG_G | SEG_E | SEG_D,                 // k
+  SEG_F | SEG_E | SEG_D,                         // L
+  SEG_G | SEG_E | SEG_C,                         // m
+  SEG_G | SEG_E | SEG_C,                         // n
+  SEG_G | SEG_E | SEG_C | SEG_D,                 // o
+  SEG_A | SEG_F | SEG_B | SEG_G | SEG_E,         // P
+  SEG_A | SEG_F | SEG_B | SEG_G | SEG_C,         // q
+  SEG_A | SEG_F | SEG_B | SEG_G | SEG_D,         // R
+  SEG_A | SEG_F | SEG_G | SEG_C | SEG_D,         // S
+  SEG_A | SEG_F | SEG_E,                         // T
+  SEG_F | SEG_E | SEG_D | SEG_C | SEG_B,         // U
+  SEG_F | SEG_E | SEG_D | SEG_C | SEG_B,         // V
+  SEG_F | SEG_E | SEG_D | SEG_C | SEG_B | SEG_G, // W
+  SEG_F | SEG_B | SEG_G | SEG_E | SEG_C,         // X
+  SEG_F | SEG_G | SEG_B | SEG_C,                 // Y
+  SEG_A | SEG_B | SEG_G | SEG_E | SEG_C,         // Z
+};
 const char *abc      =  "ETIANMSURWDKGOHVF\0L\0PJBXCYZQ\0\054S3\0\0D2\0\0+\0\0\0J16=/\0C\0H\07\0GN8\090";
 const char *ssid     =  "Landownunder";
 const char *password =  "icomefroma";
@@ -20,7 +68,9 @@ uint8_t    currPos   =   1; // current position in binary tree "abc"
 uint8_t    bttnState = LOW; // last state of button
 uint8_t    s         =   0; // state of DFA
 uint32_t   t         =   0; // time in ms
+uint8_t    disp[]    = {0x00, 0x00, 0x0, 0x00}; // display data
 
+TM1637Display tm1637(clk, dio);
 WiFiClient client;
 PubSubClient mqtt(client);
 String       mac;           // MAC addr. is used as uid
@@ -33,13 +83,17 @@ void sendLetter(char letter);
 void sendLetter(uint8_t pos);
 char getLetter(uint8_t pos);
 void onReceive(char* topic, byte* payload, unsigned int length);
+void appendChar(char c);
 
 
 // implementations
 void setup() {
   Serial.begin(115200);
-  // while ( !Serial ) delay(10);
-  pinMode(buttonPin, INPUT);
+  while ( !Serial ) delay(10);
+  pinMode(sig, INPUT);
+  pinMode(clk, OUTPUT);
+  pinMode(dio, OUTPUT);
+
   Serial.println("Connecting to WiFi");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -55,11 +109,13 @@ void setup() {
   while (!mqtt.connect(buf)) delay(500);
   Serial.println("MQTT connected");
   mqtt.subscribe(topicSub);
+
+  tm1637.setBrightness(0x0f);
 }
 
 void loop() {
   mqtt.loop();
-  int b = digitalRead(buttonPin);
+  int b = digitalRead(sig);
 
   if (LOW == bttnState) {
     if (HIGH == b) {
@@ -136,6 +192,19 @@ void onReceive(char* topic, byte* payload, unsigned int length) {
     Serial.print(letter);
     Serial.print("\"\n");
 
-    // OUTPUT TO DISPLAY HERE
+    // output to display
+    appendChar(letter);
+    tm1637.setSegments(disp);
+  }
+}
+
+void appendChar(char c) {
+  for (int i = 1; i < 4; ++i) {
+    disp[i - 1] = disp[i];
+  }
+  if (47 < c && 91 > c) {
+    disp[3] = seg[c - 48];
+  } else {
+    disp[3] = 0x00;
   }
 }
