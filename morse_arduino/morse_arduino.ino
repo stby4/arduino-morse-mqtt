@@ -89,7 +89,7 @@ void appendChar(char c);
 // implementations
 void setup() {
   Serial.begin(115200);
-  while ( !Serial ) delay(10);
+  //while ( !Serial ) delay(10);
   pinMode(sig, INPUT);
   pinMode(clk, OUTPUT);
   pinMode(dio, OUTPUT);
