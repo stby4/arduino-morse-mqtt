@@ -23,13 +23,12 @@ The following deliverables are mandatory.
 ### Source code
 Source code, Arduino C, JS or Python, committed to (this) project repo.
 
-[morse_arduino/morse_arduino.ino](morse_arduino.ino)
+- [morse_arduino/morse_arduino.ino](morse_arduino.ino)
+- [morse_node/index.js](Nodejs/index.js)
+- [morse_web/index.html](morse_web/index.html)
 
-[Nodejs/MY_TEAM_PROJECT.js](Nodejs/MY_TEAM_PROJECT_FILE.js)
+See the [Wiki](https://github.com/fhnw-iot-4ia/iot-project-the_last_ones/wiki) to help setup the project.
 
-[Python/MY_TEAM_PROJECT.py](Nodejs/MY_TEAM_PROJECT_FILE.py)
-
-... (adapt as required)
 
 1) Embedded code / microcontroller firmware.
 2) Glue Code used on the gateway or "in the cloud".
@@ -38,7 +37,7 @@ Source code, Arduino C, JS or Python, committed to (this) project repo.
 ### Presentation
 4-slide presentation, PDF format, committed to (this) project repo.
 
-[MY_TEAM_PROJECT_PRESENTATION.pdf](MY_TEAM_PROJECT_PRESENTATION.pdf)
+[morse_code_presentation.pdf](morse_code_presentation.pdf)
 
 1) Use-case of your project.
 2) Reference model of your project.

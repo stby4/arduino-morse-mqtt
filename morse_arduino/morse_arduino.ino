@@ -147,14 +147,16 @@ void loop() {
 }
 
 void sendLetter(char letter) {
-  Serial.print("I wrote: \"");
-  Serial.print(letter);
-  Serial.print("\"\n");
-  String message = mac + "," + letter;
-  uint16_t l = message.length();
-  char buf[l];
-  message.toCharArray(buf, l + 1);
-  mqtt.publish(topicPub, buf);
+  if (47 < letter && 91 > letter) {
+    Serial.print("I wrote: \"");
+    Serial.print(letter);
+    Serial.print("\"\n");
+    String message = mac + "," + letter;
+    uint16_t l = message.length();
+    char buf[l];
+    message.toCharArray(buf, l + 1);
+    mqtt.publish(topicPub, buf);
+  }
 }
 
 void sendLetter(uint8_t pos) {
