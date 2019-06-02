@@ -36,7 +36,7 @@ client.on('message', function (topic, message) {
     }
 
     const options = {
-      uri: 'https://maker.ifttt.com/trigger/message_received/with/key/ieUjJOEVdcUtlLeoXiOfSpSfHzwnPNq4T5Xz4X33iBR',
+      uri: 'https://maker.ifttt.com/trigger/message_received/with/key/ieUjJOEVdcUtlLeoXiOfSoiGPq1zgxPTLlGNaBrdZ1J',
       method: 'POST',
       json
     }
