@@ -21,7 +21,7 @@ uint8_t    currPos   =   1; // current position in binary tree "abc"
 uint8_t    bttnState = LOW; // last state of button
 uint8_t    s         =   0; // state of DFA
 uint32_t   t         =   0; // time in ms
-char       disp[5]   = "    ";// display data
+char       disp[5]   = "    "; // display data
 
 SevenSegmentTM1637    display(clk, dio);
 WiFiClient client;
