@@ -30,9 +30,10 @@ Source code, Arduino C, JS or Python, committed to (this) project repo.
 See the [Wiki](https://github.com/fhnw-iot-4ia/iot-project-the_last_ones/wiki) to help setup the project.
 
 
-1) Embedded code / microcontroller firmware.
-2) Glue Code used on the gateway or "in the cloud".
-3) App or Web UI code, or IoT platform setup steps.
+1) Embedded code / microcontroller firmware: [morse_arduino/morse_arduino.ino](morse_arduino.ino)
+2) Glue Code usable "in the cloud": [morse_node/index.js](Nodejs/index.js)
+3) App or Web UI code: [morse_web/index.html](morse_web/index.html)
+4) IoT platform setup steps: [Wiki](https://github.com/fhnw-iot-4ia/iot-project-the_last_ones/wiki#use-own-ifttt-account)
 
 ### Presentation
 4-slide presentation, PDF format, committed to (this) project repo.
