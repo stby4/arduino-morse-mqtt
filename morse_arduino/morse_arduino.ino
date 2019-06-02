@@ -11,8 +11,8 @@
 #define abcLen           62 // length of the binary tree
 
 const char *abc      =  "ETIANMSURWDKGOHVF\0L\0PJBXCYZQ\0\054S3\0\0D2\0\0+\0\0\0J16=/\0C\0H\07\0GN8\090";
-const char *ssid     =  "Ru-Z 2.4Ghz";
-const char *password =  "f0rdmustang";
+const char *ssid     =  "ssid";
+const char *password =  "password";
 const char *topicPub =  "morse/791548";
 const char *topicSub =  "morse/791548";
 
