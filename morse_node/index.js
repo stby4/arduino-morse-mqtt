@@ -2,6 +2,8 @@ const mqtt = require('mqtt')
 const request = require('request')
 
 const client = mqtt.connect('mqtt://test.mosquitto.org:1883')
+const ifttt_event = 'message_received'
+const ifttt_key = 'ieUjJOEVdcUtlLeoXiOfSoOb6N48N73heOroj6lqPLj'
 
 const message_queue = new Object()
 
@@ -36,7 +38,7 @@ client.on('message', function (topic, message) {
     }
 
     const options = {
-      uri: 'https://maker.ifttt.com/trigger/message_received/with/key/ieUjJOEVdcUtlLeoXiOfSoOb6N48N73heOroj6lqPLj',
+      uri: `https://maker.ifttt.com/trigger/${ifttt_event}/with/key/${ifttt_key}`,
       method: 'POST',
       json
     }

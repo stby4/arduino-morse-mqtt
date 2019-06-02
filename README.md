@@ -25,14 +25,14 @@ Source code, Arduino C, JS or Python, committed to (this) project repo.
 
 - [morse_arduino/morse_arduino.ino](morse_arduino.ino)
 - [morse_node/index.js](Nodejs/index.js)
-- [morse_web/index.html](morse_web/index.html)
+- [index.html](index.html)
 
 See the [Wiki](https://github.com/fhnw-iot-4ia/iot-project-the_last_ones/wiki) to help setup the project.
 
 
 1) Embedded code / microcontroller firmware: [morse_arduino/morse_arduino.ino](morse_arduino.ino)
 2) Glue Code usable "in the cloud": [morse_node/index.js](Nodejs/index.js)
-3) App or Web UI code: [morse_web/index.html](morse_web/index.html)
+3) App or Web UI code: [index.html](index.html) / [online](https://fhnw-iot-4ia.github.io/iot-project-the_last_ones/)
 4) IoT platform setup steps: [Wiki](https://github.com/fhnw-iot-4ia/iot-project-the_last_ones/wiki#use-own-ifttt-account)
 
 ### Presentation
@@ -48,7 +48,7 @@ See the [Wiki](https://github.com/fhnw-iot-4ia/iot-project-the_last_ones/wiki) t
 ### Live demo
 Working end-to-end prototype, "device to cloud", part of your 10' presentation.
 
-[https://MY_TEAM_PROJECT_DEMO_HOST:PORT/](https://MY_TEAM_PROJECT_DEMO_HOST:PORT/)
+[https://fhnw-iot-4ia.github.io/iot-project-the_last_ones/](https://fhnw-iot-4ia.github.io/iot-project-the_last_ones/)
 
 1) Sensor input on a IoT device triggers an event.
 2) The event or measurement shows up online, in an app or Web client.
