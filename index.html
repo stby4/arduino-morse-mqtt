@@ -61,7 +61,7 @@
             }
         }
 
-        const client = new Paho.MQTT.Client("test.mosquitto.org", 8081, '', me);
+        const client = new Paho.MQTT.Client("test.mosquitto.org", location.protocol === 'https:' ? 8081 : 8080, '', me);
         client.onMessageArrived = onMessageArrived;
         client.connect({ onSuccess: onConnect });
     </script>
