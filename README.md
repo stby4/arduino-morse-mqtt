@@ -1,9 +1,6 @@
 # IoT Engineering
 ## Project Morse Code
 
-> *Note: Do not work on this repository right away.*<br/>
-> *[Create your team copy by clicking this GitHub Classroom link](https://classroom.github.com/g/B7ncqTw4).*
-
 ## Introduction
 This project is part of the [IoT Engineering](../../../fhnw-iot) course.
 
