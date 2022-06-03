@@ -20,17 +20,17 @@ The following deliverables are mandatory.
 ### Source code
 Source code, Arduino C, JS or Python, committed to (this) project repo.
 
-- [morse_arduino/morse_arduino.ino](morse_arduino.ino)
-- [morse_node/index.js](Nodejs/index.js)
+- [morse_arduino/morse_arduino.ino](morse_arduino/morse_arduino.ino)
+- [morse_node/index.js](morse_node/index.js)
 - [index.html](index.html)
 
-See the [Wiki](https://github.com/fhnw-iot-4ia/iot-project-the_last_ones/wiki) to help setup the project.
+See the [Wiki](https://github.com/stby4/arduino-morse-mqtt/wiki) to help setup the project.
 
 
-1) Embedded code / microcontroller firmware: [morse_arduino/morse_arduino.ino](morse_arduino.ino)
-2) Glue Code usable "in the cloud": [morse_node/index.js](Nodejs/index.js)
-3) App or Web UI code: [index.html](index.html) / [online](https://fhnw-iot-4ia.github.io/iot-project-the_last_ones/)
-4) IoT platform setup steps: [Wiki](https://github.com/fhnw-iot-4ia/iot-project-the_last_ones/wiki#use-own-ifttt-account)
+1) Embedded code / microcontroller firmware: [morse_arduino/morse_arduino.ino](morse_arduino/morse_arduino.ino)
+2) Glue Code usable "in the cloud": [morse_node/index.js](morse_node/index.js)
+3) App or Web UI code: [index.html](index.html) / [online](https://stby4.github.io/arduino-morse-mqtt/)
+4) IoT platform setup steps: [Wiki](https://github.com/stby4/arduino-morse-mqtt/wiki#use-own-ifttt-account)
 
 ### Presentation
 4-slide presentation, PDF format, committed to (this) project repo.
@@ -45,7 +45,7 @@ See the [Wiki](https://github.com/fhnw-iot-4ia/iot-project-the_last_ones/wiki) t
 ### Live demo
 Working end-to-end prototype, "device to cloud", part of your 10' presentation.
 
-[https://fhnw-iot-4ia.github.io/iot-project-the_last_ones/](https://fhnw-iot-4ia.github.io/iot-project-the_last_ones/)
+[https://github.com/stby4/arduino-morse-mqtt/wiki#use-own-ifttt-account](https://github.com/stby4/arduino-morse-mqtt/wiki#use-own-ifttt-account)
 
 1) Sensor input on a IoT device triggers an event.
 2) The event or measurement shows up online, in an app or Web client.
