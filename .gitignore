@@ -408,13 +408,6 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
-# yarn v2
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
-.pnp.*
-
 ### Node Patch ###
 # Serverless Webpack directories
 .webpack/
@@ -758,10 +751,10 @@ $RECYCLE.BIN/
 
 # if you are NOT using Zero-installs, then:
 # comment the following lines
-# !.yarn/cache
+!.yarn/cache
 
 # and uncomment the following lines
-.pnp.*
+#.pnp.*
 
 ### VisualStudio ###
 ##
